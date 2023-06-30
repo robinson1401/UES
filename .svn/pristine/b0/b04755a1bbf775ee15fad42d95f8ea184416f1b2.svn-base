@@ -1,0 +1,140 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using UES.Data;
+using UES.Models;
+
+namespace UES.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class DauDiemsController : ControllerBase
+    {
+        private readonly UESContext _context;
+
+        public DauDiemsController(UESContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/DauDiems
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<DauDiem>>> GetDauDiem()
+        {
+          if (_context.DauDiem == null)
+          {
+              return NotFound();
+          }
+            return await _context.DauDiem.Include(h => h.HocPhan).ToListAsync();
+        }
+
+        // GET: api/DauDiems/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DauDiem>> GetDauDiem(Guid id)
+        {
+          if (_context.DauDiem == null)
+          {
+              return NotFound();
+          }
+            var dauDiem = _context.DauDiem
+                .Include(h => h.HocPhan)
+                .Where(d => d.Id == id)
+                .FirstOrDefault();
+
+            if (dauDiem == null)
+            {
+                return NotFound();
+            }
+
+            return dauDiem;
+        }
+
+        // PUT: api/DauDiems/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutDauDiem(Guid id, DauDiem dauDiem)
+        {
+            if (id != dauDiem.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(dauDiem).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!DauDiemExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/DauDiems
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<DauDiem>> PostDauDiem(DauDiem dauDiem)
+        {
+          if (_context.DauDiem == null)
+          {
+              return Problem("Entity set 'UESContext.DauDiem'  is null.");
+          }
+            var daudiem = new DauDiem()
+            {
+                TenDiem = dauDiem.TenDiem,
+                ThanhPhanDiem = dauDiem.ThanhPhanDiem,
+                DiemHeBon = dauDiem.DiemHeBon,
+                DiemHeBonBangChu = dauDiem.DiemHeBonBangChu
+                //DiemHeMuoi = dauDiem.DiemHeMuoi,
+                //DiemHeMuoiBangChu = dauDiem.DiemHeMuoiBangChu,
+                //DiemQuyDoi = dauDiem.DiemQuyDoi,
+                //DiemToiThieuQuaMon = dauDiem.DiemToiThieuQuaMon,
+                //MoTa = dauDiem.MoTa,
+                //HocPhanId = dauDiem.HocPhanId
+            };
+            await _context.DauDiem.AddAsync(daudiem);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetDauDiem", new { id = dauDiem.Id }, dauDiem);
+        }
+
+        // DELETE: api/DauDiems/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteDauDiem(Guid id)
+        {
+            if (_context.DauDiem == null)
+            {
+                return NotFound();
+            }
+            var dauDiem = await _context.DauDiem.FindAsync(id);
+            if (dauDiem == null)
+            {
+                return NotFound();
+            }
+
+            _context.DauDiem.Remove(dauDiem);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool DauDiemExists(Guid id)
+        {
+            return (_context.DauDiem?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+    }
+}

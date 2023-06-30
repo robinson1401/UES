@@ -1,0 +1,21 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "Log4NetCore": {
+    "PropertyOverrides": [
+      {
+        "XPath": "/log4net/appender[@name='RollingFile']/maximumFileSize",
+        "Attributes": {
+          "Value": "200KB"
+        }
+      }
+    ]
+  },
+  "AppSettings": {
+    "JwtSecret": "oXNli7ucP54p9Dpn7NFTyfoszQE72$N!xm#j^no0g9W2DiaS3o"
+  }
+}

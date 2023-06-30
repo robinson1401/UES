@@ -1,0 +1,124 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using UES.Data;
+using UES.Models;
+
+namespace UES.Controllers
+{
+    [Route("api/[controller]")]
+    [ApiController]
+    public class HocPhansController : ControllerBase
+    {
+        private readonly UESContext _context;
+
+        public HocPhansController(UESContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/HocPhans
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<HocPhan>>> GetHocPhan()
+        {
+          if (_context.HocPhan == null)
+          {
+              return NotFound();
+          }
+            return await _context.HocPhan.ToListAsync();
+        }
+
+        // GET: api/HocPhans/5
+        [HttpGet("{id}")]
+        public async Task<ActionResult<HocPhan>> GetHocPhan(Guid id)
+        {
+          if (_context.HocPhan == null)
+          {
+              return NotFound();
+          }
+            var hocPhan = await _context.HocPhan.FindAsync(id);
+
+            if (hocPhan == null)
+            {
+                return NotFound();
+            }
+
+            return hocPhan;
+        }
+
+        // PUT: api/HocPhans/5
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutHocPhan(Guid id, HocPhan hocPhan)
+        {
+            if (id != hocPhan.Id)
+            {
+                return BadRequest();
+            }
+
+            _context.Entry(hocPhan).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!HocPhanExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+
+            return NoContent();
+        }
+
+        // POST: api/HocPhans
+        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+        [HttpPost]
+        public async Task<ActionResult<HocPhan>> PostHocPhan(HocPhan hocPhan)
+        {
+          if (_context.HocPhan == null)
+          {
+              return Problem("Entity set 'UESContext.HocPhan'  is null.");
+          }
+            _context.HocPhan.Add(hocPhan);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction("GetHocPhan", new { id = hocPhan.Id }, hocPhan);
+        }
+
+        // DELETE: api/HocPhans/5
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteHocPhan(Guid id)
+        {
+            if (_context.HocPhan == null)
+            {
+                return NotFound();
+            }
+            var hocPhan = await _context.HocPhan.FindAsync(id);
+            if (hocPhan == null)
+            {
+                return NotFound();
+            }
+
+            _context.HocPhan.Remove(hocPhan);
+            await _context.SaveChangesAsync();
+
+            return NoContent();
+        }
+
+        private bool HocPhanExists(Guid id)
+        {
+            return (_context.HocPhan?.Any(e => e.Id == id)).GetValueOrDefault();
+        }
+    }
+}
